@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A2207023-3C0B-4A57-87A7-7A19967CE9CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ED0B6C83-199C-408E-B0C6-5F19532F3289}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Beerhall", "src\Beerhall\Beerhall.xproj", "{50CFD83F-5FE3-4072-9A0F-09E0AA21346B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4349A809-0BFB-4D76-8E6B-D26C0F874C7B}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Beerhall.Tests", "test\Beerhall.Tests\Beerhall.Tests.xproj", "{03003E40-4F60-40AA-857C-ACB5615937A3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50CFD83F-5FE3-4072-9A0F-09E0AA21346B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50CFD83F-5FE3-4072-9A0F-09E0AA21346B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50CFD83F-5FE3-4072-9A0F-09E0AA21346B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50CFD83F-5FE3-4072-9A0F-09E0AA21346B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03003E40-4F60-40AA-857C-ACB5615937A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03003E40-4F60-40AA-857C-ACB5615937A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03003E40-4F60-40AA-857C-ACB5615937A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03003E40-4F60-40AA-857C-ACB5615937A3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{50CFD83F-5FE3-4072-9A0F-09E0AA21346B} = {A2207023-3C0B-4A57-87A7-7A19967CE9CC}
+		{03003E40-4F60-40AA-857C-ACB5615937A3} = {4349A809-0BFB-4D76-8E6B-D26C0F874C7B}
+	EndGlobalSection
+EndGlobal
