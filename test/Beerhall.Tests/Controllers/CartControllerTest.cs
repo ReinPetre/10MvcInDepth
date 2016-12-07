@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using System.Collections.Generic;
 using Beerhall.Controllers;
@@ -16,20 +17,32 @@ namespace Beerhall.Tests.Controllers {
         private readonly Cart _cart;
         private readonly DummyApplicationDbContext _context;
         private readonly Mock<IBeerRepository> _beerRepository;
+        private readonly Mock<ILocationRepository> _locationRepository;
+        private readonly Mock<ICustomerRepository> _customerRepository;
+        private readonly Customer _customerJan;
+        private readonly ShippingViewModel _shippingVm;
 
         public CartControllerTest() {
             _context = new DummyApplicationDbContext();
             _beerRepository = new Mock<IBeerRepository>();
             _beerRepository.Setup(b => b.GetAll()).Returns(_context.Beers);
-            var locationRepository = new Mock<ILocationRepository>();
-            locationRepository.Setup(b => b.GetAll()).Returns(_context.Locations);
+            _locationRepository = new Mock<ILocationRepository>();
+            _locationRepository.Setup(b => b.GetAll()).Returns(_context.Locations);
+            _customerRepository = new Mock<ICustomerRepository>();
+            _customerRepository.Setup(b => b.GetBy("jan@hogent.be")).Returns(_context.CustomerJan);
 
-            _controller = new CartController(_beerRepository.Object, locationRepository.Object) {
+            _controller = new CartController(_beerRepository.Object, _locationRepository.Object, _customerRepository.Object) {
                 TempData = new Mock<ITempDataDictionary>().Object
             };
 
-            _cart = new Cart();
-            _cart.AddLine(_context.Wittekerke, 5); // Beer with BeerId = 2
+            _cart = _context.CartFilled;
+            _customerJan = _context.CustomerJan;
+            _shippingVm = new ShippingViewModel {
+                DeliveryDate = DateTime.Today.AddDays(5).DayOfWeek == DayOfWeek.Sunday ? DateTime.Today.AddDays(6) : DateTime.Today.AddDays(5),
+                Giftwrapping = true,
+                PostalCode = _context.Bavikhove.PostalCode,
+                Street = "Bavikhovestraat"
+            };
         }
 
         #region Index
@@ -115,6 +128,70 @@ namespace Beerhall.Tests.Controllers {
             Assert.Equal(3, model.Locations.Count());
         }
 
+        #endregion
+
+        #region Checkout HttpPost
+
+        [Fact]
+        public void CheckOut_EmptyCart_RedirectsToIndex() {
+            var result = _controller.Checkout(_customerJan, new Cart(), _shippingVm) as RedirectToActionResult;
+            Assert.Equal("Index", result.ActionName);
+        }
+
+        [Fact]
+        public void CheckOut_NoModelErrors_RedirectsToIndexInStore() {
+            _locationRepository.Setup(l => l.GetBy(_context.Bavikhove.PostalCode)).Returns(_context.Bavikhove);
+            var result = _controller.Checkout(_customerJan, _cart, _shippingVm) as RedirectToActionResult;
+            Assert.Equal("Index", result.ActionName);
+            Assert.Equal("Store", result.ControllerName);
+        }
+
+        [Fact]
+        public void CheckOut_NoModelErrors_PlacesOrder() {
+            _locationRepository.Setup(l => l.GetBy(_context.Bavikhove.PostalCode)).Returns(_context.Bavikhove);
+            _controller.Checkout(_customerJan, _cart, _shippingVm);
+            Assert.Equal(1, _customerJan.Orders.Count);
+        }
+
+        [Fact]
+        public void CheckOut_NoModelErrors_ClearsTheCart() {
+            _locationRepository.Setup(l => l.GetBy(_context.Bavikhove.PostalCode)).Returns(_context.Bavikhove);
+            _controller.Checkout(_customerJan, _cart, _shippingVm);
+            Assert.Equal(0, _cart.NumberOfItems);
+        }
+
+        [Fact]
+        public void CheckOut_NoModelErrors_PersistsTheOrder() {
+            _locationRepository.Setup(l => l.GetBy(_context.Bavikhove.PostalCode)).Returns(_context.Bavikhove);
+            _controller.Checkout(_customerJan, _cart, _shippingVm);
+            _customerRepository.Verify(c => c.SaveChanges(), Times.Once());
+        }
+
+        [Fact]
+        public void CheckOut_ModelErrors_PassesCheckOutViewModelInModel() {
+            _controller.ModelState.AddModelError("any key", "any error");
+            _shippingVm.Street = "";
+            var result = _controller.Checkout(_customerJan, _cart, _shippingVm) as ViewResult;
+            CheckOutViewModel model = result.Model as CheckOutViewModel;
+            Assert.Equal(_shippingVm, model.ShippingViewModel);
+            Assert.Equal(3, model.Locations.Count());
+        }
+
+        [Fact]
+        public void CheckOut_DomainThrowsException_PassesCheckOutViewModelInModel() {
+            _shippingVm.Street = "";
+            var result = _controller.Checkout(_customerJan, _cart, _shippingVm) as ViewResult;
+            CheckOutViewModel model = result.Model as CheckOutViewModel;
+            Assert.Equal(_shippingVm, model.ShippingViewModel);
+            Assert.Equal(3, model.Locations.Count());
+        }
+
+        [Fact]
+        public void CheckOut_ModelErrors_ReturnsDefaultView() {
+            _controller.ModelState.AddModelError("any key", "any error");
+            var result = _controller.Checkout(_customerJan, _cart, _shippingVm) as ViewResult;
+            Assert.True(String.IsNullOrEmpty(result.ViewName));
+        }
         #endregion
     }
 }

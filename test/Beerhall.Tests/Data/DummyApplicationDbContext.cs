@@ -13,6 +13,8 @@ namespace Beerhall.Tests.Data {
         public Beer BavikPils { get; private set; }
         public Beer Wittekerke { get; private set; }
         public Location Bavikhove { get; }
+        public Customer CustomerJan { get; }
+        public Cart CartFilled { get; }
 
         public DummyApplicationDbContext() {
             int beerId = 1;
@@ -39,6 +41,15 @@ namespace Beerhall.Tests.Data {
             Brewers = new[] { DeLeeuw, Moortgat, Bavik };
 
             Beers = Brewers.SelectMany(b => b.Beers).OrderBy(be => be.Name);
+            CartFilled = new Cart();
+            CartFilled.AddLine(Wittekerke, 5);
+            CustomerJan = new Customer {
+                Email = "jan@hogent.be",
+                FirstName = "Jan",
+                Name = "De man",
+                Location = Bavikhove,
+                Street = "Bavikhovestraat"
+            };
         }
     }
 }
