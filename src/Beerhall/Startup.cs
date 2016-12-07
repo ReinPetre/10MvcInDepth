@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Beerhall.Data;
 using Beerhall.Data.Repositories;
+using Beerhall.Filters;
 using Beerhall.Services;
 using Beerhall.Models.Domain;
 using Microsoft.AspNetCore.Http;
@@ -63,6 +64,7 @@ namespace Beerhall
             services.AddScoped<IBrewerRepository, BrewerRepository>();
             services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<IBeerRepository, BeerRepository>();
+            services.AddScoped<CartSessionFilter>();
             services.AddScoped<BeerhallDataInitializer>();
 
         }
