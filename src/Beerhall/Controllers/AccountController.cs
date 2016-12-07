@@ -20,19 +20,25 @@ namespace Beerhall.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly ILocationRepository _locationRepository;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            ICustomerRepository customerRepository,
+            ILocationRepository locationRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            _customerRepository = customerRepository;
+            _locationRepository = locationRepository;
         }
 
         //
@@ -90,6 +96,11 @@ namespace Beerhall.Controllers
         public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            ViewData["Locations"] = new SelectList(
+              _locationRepository.GetAll().OrderBy(l => l.Name),
+              nameof(Location.PostalCode),
+              nameof(Location.Name),
+              null);
             return View();
         }
 
@@ -108,6 +119,15 @@ namespace Beerhall.Controllers
                 if (result.Succeeded)
                     result = await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "customer"));
                 if (result.Succeeded) {
+                    var customer = new Customer {
+                        Email = model.Email,
+                        Name = model.Name,
+                        FirstName = model.FirstName,
+                        Street = model.Street,
+                        Location = _locationRepository.GetBy(model.PostalCode)
+                    };
+                    _customerRepository.Add(customer);
+                    _customerRepository.SaveChanges();
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

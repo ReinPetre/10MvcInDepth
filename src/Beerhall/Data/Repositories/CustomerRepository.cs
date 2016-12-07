@@ -15,6 +15,9 @@ namespace Beerhall.Data.Repositories {
         public Customer GetBy(string email) {
             return _customers.Include(c => c.Location).SingleOrDefault(c => c.Email == email);
         }
+        public void Add(Customer customer) {
+            _customers.Add(customer);
+        }
 
         public void SaveChanges() {
             _dbContext.SaveChanges();
