@@ -1,12 +1,15 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Beerhall.Models.Domain {
+    [JsonObject(MemberSerialization.OptIn)]
     public class Beer {
         #region Fields
         private string _name;
         #endregion
 
         #region Properties
+        [JsonProperty]
         public int BeerId { get; set; }
         public string Name {
             get {
@@ -25,6 +28,7 @@ namespace Beerhall.Models.Domain {
         #endregion
 
         #region Constructors
+        [JsonConstructor]
         protected Beer() {
 
         }
