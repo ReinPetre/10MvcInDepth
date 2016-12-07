@@ -15,12 +15,31 @@ namespace Beerhall.Data {
         public DbSet<Brewer> Brewers { get; set; }
         public DbSet<Beer> Beers { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Brewer>(MapBrewer);
             modelBuilder.Entity<Beer>(MapBeer);
             modelBuilder.Entity<Location>(MapLocation);
+            modelBuilder.Entity<Order>(MapOrder);
+            modelBuilder.Entity<OrderLine>(MapOrderLine);
+        }
+
+        public static void MapOrder(EntityTypeBuilder<Order> o) {
+            o.ToTable("Order");
+            o.Property(t => t.Street).IsRequired().HasMaxLength(100);
+            o.HasMany(t => t.OrderLines).WithOne().HasForeignKey(t => t.OrderId).IsRequired().OnDelete(DeleteBehavior.Cascade);
+            o.HasOne(c => c.Location).WithMany().IsRequired().OnDelete(DeleteBehavior.Restrict);
+        }
+
+        public static void MapOrderLine(EntityTypeBuilder<OrderLine> ol) {
+            ol.ToTable("OrderLine");
+            ol.HasKey(t => new {
+                t.OrderId,
+                t.ProductId
+            });
+            ol.HasOne(o => o.Product).WithMany().IsRequired().HasForeignKey(o => o.ProductId).OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void MapLocation(EntityTypeBuilder<Location> l) {
