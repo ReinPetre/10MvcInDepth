@@ -13,6 +13,7 @@ namespace Beerhall.Data {
         }
 
         public DbSet<Brewer> Brewers { get; set; }
+        public DbSet<Beer> Beers { get; set; }
         public DbSet<Location> Locations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {

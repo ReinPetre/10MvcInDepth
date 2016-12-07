@@ -62,6 +62,7 @@ namespace Beerhall
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddScoped<IBrewerRepository, BrewerRepository>();
             services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<IBeerRepository, BeerRepository>();
             services.AddScoped<BeerhallDataInitializer>();
 
         }
