@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Beerhall.Filters;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,11 @@ namespace Beerhall.Controllers {
     [ServiceFilter(typeof(CartSessionFilter))]
     public class CartController : Controller {
         private readonly IBeerRepository _beerRepository;
+        private readonly ILocationRepository _locationRepository;
 
-        public CartController(IBeerRepository beerRepository) {
+        public CartController(IBeerRepository beerRepository, ILocationRepository locationRepository) {
             _beerRepository = beerRepository;
+            _locationRepository = locationRepository;
         }
 
         public IActionResult Index(Cart cart) {
@@ -44,6 +47,10 @@ namespace Beerhall.Controllers {
                 TempData["error"] = "Sorry, something went wrong, the product was not removed from your shopping cart...";
             }
             return RedirectToAction("Index");
+        }
+
+        public IActionResult Checkout(Cart cart) {
+            throw new NotImplementedException();
         }
     }
 }
